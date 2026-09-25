@@ -1,0 +1,6 @@
+{
+  "name": "AutoTube Studio",
+  "description": "Automated AI 3D cartoon video creation, market trend analysis, and morning/evening scheduler.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
