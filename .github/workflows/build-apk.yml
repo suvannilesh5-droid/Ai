@@ -159,7 +159,6 @@ jobs:
 
           NOTES=$(cat <<'EOF'
 ### AutoTube Studio - Debug APK
-
 - *Build Type*: Automatically generated debug APK
 - **Builder**: GitHub Actions
 - **Run Number**: ${{ github.run_number }}
