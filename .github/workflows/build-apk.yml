@@ -113,7 +113,7 @@ jobs:
           mkdir -p "$RELEASE_DIR"
 
           RAW_REPO_NAME="${{ github.event.repository.name }}"
-          SAFE_REPO_NAME=$(echo "$RAW_REPO_NAME" | tr -cs 'a-zA-Z0-9._-' '-' | sed 's/^-//;s/-$//')
+          SAFE_REPO_NAME=$(echo "$RAW_REPO_NAME" \vert{} tr -cs 'a-zA-Z0-9._-' '-' \vert{} sed 's/^-//;s/-$//')
           if [ -z "$SAFE_REPO_NAME" ]; then
             SAFE_REPO_NAME="app"
           fi
@@ -123,7 +123,7 @@ jobs:
 
           cp "app/build/outputs/apk/debug/app-debug.apk" "$DEST_PATH"
 
-          if [ ! -f "$DEST_PATH" ] || [ ! -s "$DEST_PATH" ]; then
+          if [ ! -f "$DEST_PATH" ] \vert{}\vert{} [ ! -s "$DEST_PATH" ]; then
             echo "Error: Failed to prepare release asset at $DEST_PATH"
             exit 1
           fi
@@ -141,7 +141,7 @@ jobs:
           gh --version
           RELEASE_APK="${{ steps.prepare_asset.outputs.apk_path }}"
 
-          if [ ! -f "$RELEASE_APK" ] || [ ! -s "$RELEASE_APK" ]; then
+          if [ ! -f "$RELEASE_APK" ] \vert{}\vert{} [ ! -s "$RELEASE_APK" ]; then
             echo "Error: Release asset is missing or empty: $RELEASE_APK"
             exit 1
           fi
@@ -158,16 +158,16 @@ jobs:
           TITLE="Debug APK Build #${{ github.run_number }}"
 
           NOTES=$(cat <<'EOF'
-### AutoTube Studio - Debug APK
-- *Build Type*: Automatically generated debug APK
-- **Builder**: GitHub Actions
-- **Run Number**: ${{ github.run_number }}
-- **Run Attempt**: ${{ github.run_attempt }}
-- **Source Commit**: ${{ github.sha }}
-- **Purpose**: Testing and verification
-- **Notice**: Not a Play Store production release
-- **Signing**: Signed with temporary debug keystore
-EOF
+          ### AutoTube Studio - Debug APK
+          - Build Type: Automatically generated debug APK
+          - Builder: GitHub Actions
+          - Run Number: ${{ github.run_number }}
+          - Run Attempt: ${{ github.run_attempt }}
+          - Source Commit: ${{ github.sha }}
+          - Purpose: Testing and verification
+          - Notice: Not a Play Store production release
+          - Signing: Signed with temporary debug keystore
+          EOF
           )
 
           gh release create "$TAG" "$RELEASE_APK" \
@@ -194,22 +194,22 @@ EOF
             echo "APK Asset Filename: $FILENAME"
 
             cat <<EOF >> "$GITHUB_STEP_SUMMARY"
-## 🚀 Debug APK Build & Release Succeeded
+          ## 🚀 Debug APK Build & Release Succeeded
 
-- **Release Page**: [$TAG]($RELEASE_URL)
-- **APK Asset**: \`$FILENAME\`
-- **Direct Download**: Download directly from the **Assets** section of the release page on your phone or computer.
-- **Actions Artifact**: The standard workflow artifact \`app-debug-apk\` is also available as a backup.
-EOF
+          - **Release Page**: [$TAG]($RELEASE_URL)
+          - **APK Asset**: \`$FILENAME\`
+          - **Direct Download**: Download directly from the **Assets** section of the release page on your phone or computer.
+          - **Actions Artifact**: The standard workflow artifact \`app-debug-apk\` is also available as a backup.
+          EOF
           else
             echo "::warning::GitHub Release publishing did not complete successfully or was skipped."
             echo "APK build succeeded. Actions artifact 'app-debug-apk' remains available."
 
             cat <<EOF >> "$GITHUB_STEP_SUMMARY"
-## ⚠️ Debug APK Build Succeeded (Release Notice)
+          ## ⚠️ Debug APK Build Succeeded (Release Notice)
 
-- **Build Status**: Succeeded
-- **Actions Artifact**: The debug APK is preserved and available for download under this run's artifacts as \`app-debug-apk\`.
-- **Release Publishing**: Release creation was not completed, but the APK artifact is preserved.
-EOF
+          - **Build Status**: Succeeded
+          - **Actions Artifact**: The debug APK is preserved and available for download under this run's artifacts as \`app-debug-apk\`.
+          - **Release Publishing**: Release creation was not completed, but the APK artifact is preserved.
+          EOF
           fi
